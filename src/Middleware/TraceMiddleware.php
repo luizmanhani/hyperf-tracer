@@ -34,6 +34,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
 
+use function Hyperf\Coroutine\defer;
 use const OpenTracing\Tags\SPAN_KIND_RPC_SERVER;
 
 class TraceMiddleware implements MiddlewareInterface
