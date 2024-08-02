@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact  leo@opencodeco.dev
  * @license  https://github.com/opencodeco/hyperf-metric/blob/main/LICENSE
  */
+
 namespace Hyperf\Tracer\Aspect;
 
 use Hyperf\Di\Aop\AroundInterface;
@@ -18,6 +19,7 @@ use Hyperf\Tracer\ExceptionAppender;
 use Hyperf\Tracer\SpanStarter;
 use Hyperf\Tracer\SpanTagManager;
 use Hyperf\Tracer\SwitchManager;
+use Hyperf\Tracer\TracerContext;
 use OpenTracing\Tracer;
 use ReflectionProperty;
 use Throwable;
@@ -39,16 +41,13 @@ class MongoCollectionAspect implements AroundInterface
         'makePayload',
     ];
 
-    protected Tracer $tracer;
 
     protected SpanTagManager $spanTagManager;
 
     public function __construct(
-        Tracer $tracer,
         protected SwitchManager $switchManager,
         SpanTagManager $spanTagManager,
     ) {
-        $this->tracer = $tracer;
         $this->spanTagManager = $spanTagManager;
     }
 
@@ -87,7 +86,7 @@ class MongoCollectionAspect implements AroundInterface
         }
 
         $appendHeaders = [];
-        $this->tracer->inject(
+        TracerContext::getTracer()->inject(
             $span->getContext(),
             TEXT_MAP,
             $appendHeaders

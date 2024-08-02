@@ -9,18 +9,30 @@ declare(strict_types=1);
  * @contact  leo@opencodeco.dev
  * @license  https://github.com/opencodeco/hyperf-metric/blob/main/LICENSE
  */
+use Hyperf\Tracer\Adapter\JaegerTracerFactory;
+use Hyperf\Tracer\Adapter\NoopTracerFactory;
+use Hyperf\Tracer\Adapter\Reporter\Kafka;
+use Hyperf\Tracer\Adapter\ZipkinTracerFactory;
+use Zipkin\Reporters\Http;
+use Zipkin\Reporters\Noop;
 use Zipkin\Samplers\BinarySampler;
 
 use function Hyperf\Support\env;
 
 return [
+    // To disable hyperf/opentracing temporarily, set default driver to noop.
     'default' => env('TRACER_DRIVER', 'zipkin'),
     'enable' => [
-        'guzzle' => env('TRACER_ENABLE_GUZZLE', false),
-        'redis' => env('TRACER_ENABLE_REDIS', false),
+        'coroutine' => env('TRACER_ENABLE_COROUTINE', false),
         'db' => env('TRACER_ENABLE_DB', false),
-        'method' => env('TRACER_ENABLE_METHOD', false),
+        'elasticserach' => env('TRACER_ENABLE_ELASTICSERACH', false),
         'exception' => env('TRACER_ENABLE_EXCEPTION', false),
+        'grpc' => env('TRACER_ENABLE_GRPC', false),
+        'guzzle' => env('TRACER_ENABLE_GUZZLE', false),
+        'method' => env('TRACER_ENABLE_METHOD', false),
+        'redis' => env('TRACER_ENABLE_REDIS', false),
+        'rpc' => env('TRACER_ENABLE_RPC', false),
+        'ignore_exceptions' => [],
     ],
     'tracer' => [
         'zipkin' => [
@@ -39,7 +51,7 @@ return [
             'sampler' => BinarySampler::createAsAlwaysSample(),
         ],
         'jaeger' => [
-            'driver' => Hyperf\Tracer\Adapter\JaegerTracerFactory::class,
+            'driver' => JaegerTracerFactory::class,
             'name' => env('APP_NAME', 'skeleton'),
             'options' => [
                 /*
@@ -57,6 +69,9 @@ return [
                     'reporting_port' => env('JAEGER_REPORTING_PORT', 5775),
                 ],
             ],
+        ],
+        'noop' => [
+            'driver' => NoopTracerFactory::class,
         ],
     ],
     'tags' => [
@@ -90,6 +105,10 @@ return [
         ],
         'response' => [
             'status_code' => 'response.status_code',
+        ],
+        'rpc' => [
+            'path' => 'rpc.path',
+            'status' => 'rpc.status',
         ],
     ],
 ];

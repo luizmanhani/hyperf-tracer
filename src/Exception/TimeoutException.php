@@ -10,14 +10,10 @@ declare(strict_types=1);
  * @license  https://github.com/opencodeco/hyperf-metric/blob/main/LICENSE
  */
 
-namespace Hyperf\Tracer\Contract;
+namespace Hyperf\Tracer\Exception;
 
-use OpenTracing\Tracer;
+use RuntimeException;
 
-interface NamedFactoryInterface
+class TimeoutException extends RuntimeException
 {
-    /**
-     * Create the object from factory.
-     */
-    public function make(string $name): Tracer;
 }
