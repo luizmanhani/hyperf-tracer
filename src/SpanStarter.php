@@ -71,31 +71,4 @@ trait SpanStarter
         $child->setTag('parent.name', $root->getOperationName());
         return $child;
     }
-
-    private function getTracerRoot(int $coroutineId): ?Span
-    {
-        /** @var null|Span $root */
-        $root = Context::get('tracer.root', null, $coroutineId);
-
-        if ($root instanceof Span) {
-            return $root;
-        }
-
-        if ($coroutineId <= 1) {
-            return $root;
-        }
-
-        try {
-            $parent_id = Coroutine::parentId($coroutineId);
-        } catch (CoroutineDestroyedException $exception) {
-            if (ApplicationContext::hasContainer() && ApplicationContext::getContainer()->has(StdoutLoggerInterface::class)) {
-                ApplicationContext::getContainer()
-                    ->get(StdoutLoggerInterface::class)
-                    ->warning($exception->getMessage());
-            }
-            return null;
-        }
-
-        return $this->getTracerRoot($parent_id);
-    }
 }

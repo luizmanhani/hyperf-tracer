@@ -43,7 +43,34 @@ class TracerContext
 
     public static function getRoot(): ?Span
     {
-        return Context::get(self::ROOT) ?: null;
+        return self::getRootRecursive(Coroutine::id());
+    }
+
+    private static function getRootRecursive(int $coroutineId): ?Span
+    {
+        /** @var null|Span $root */
+        $root = Context::get(self::ROOT, null, $coroutineId);
+
+        if ($root instanceof Span) {
+            return $root;
+        }
+
+        if ($coroutineId <= 1) {
+            return $root;
+        }
+
+        try {
+            $parent_id = Coroutine::parentId($coroutineId);
+        } catch (CoroutineDestroyedException $exception) {
+            if (ApplicationContext::hasContainer() && ApplicationContext::getContainer()->has(StdoutLoggerInterface::class)) {
+                ApplicationContext::getContainer()
+                    ->get(StdoutLoggerInterface::class)
+                    ->warning($exception->getMessage());
+            }
+            return null;
+        }
+
+        return self::getRootRecursive($parent_id);
     }
 
     public static function setTraceId(string $traceId): string

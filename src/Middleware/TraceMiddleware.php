@@ -71,8 +71,6 @@ class TraceMiddleware implements MiddlewareInterface
         defer(function () use ($tracer) {
             try {
                 $tracer->flush();
-            } catch (Throwable) {
-                $this->tracer->flush();
             } catch (Throwable $exception) {
                 if (ApplicationContext::hasContainer() && ApplicationContext::getContainer()->has(StdoutLoggerInterface::class)) {
                     ApplicationContext::getContainer()
@@ -94,7 +92,6 @@ class TraceMiddleware implements MiddlewareInterface
                 $span->setTag($this->spanTagManager->get('response', 'body'), (string) $response->getBody());
             }
         } catch (Throwable $exception) {
-            $this->switchManager->isEnabled('exception') && $this->appendExceptionToSpan($span, $exception);
             if ($this->switchManager->isEnabled('exception') && ! $this->switchManager->isIgnoreException($exception)) {
                 $this->appendExceptionToSpan($span, $exception);
             }

@@ -1,6 +1,6 @@
 {
     "name": "hyperf/tracer",
-    "description": "A open tracing system implemented for Hyperf or other coroutine framework",
+    "description": "Drop-in replacement for the Hyperf Tracer component.",
     "license": "MIT",
     "keywords": [
         "php",
